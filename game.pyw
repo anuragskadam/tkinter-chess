@@ -12,7 +12,7 @@ gameWindow.resizable(0, 0)
 SIDE_OF_WHITE = 0
 # starting from bottom anti-clockwise [0, 1, 2, 3]
 
-number_of_human_player = 0
+NUMBER_OF_HUMAN_PLAYERS = 1
 
 
 HORIZONTAL_VERTICAL_ARRANGEMENT_VAR = [0, 1, 0, 1][SIDE_OF_WHITE]
@@ -23,10 +23,10 @@ SIDE_COLOUR_VAR = [0, 0, 1, 1][SIDE_OF_WHITE]
 CHECKMATER_VAR = 0
 # bool variable to directly create a checkmate state of the board
 
-if number_of_human_player == 1:
+if NUMBER_OF_HUMAN_PLAYERS == 1:
     MOVE_TIME_INTERVAL = 500
-elif number_of_human_player == 0:
-    MOVE_TIME_INTERVAL = 2000
+elif NUMBER_OF_HUMAN_PLAYERS == 0:
+    MOVE_TIME_INTERVAL = 500
     # milliseconds
 
 
@@ -148,7 +148,7 @@ class Boxes:
             MOVES_PLAYED += 1
             check_checker_box_colourer(PIECE_CLICK_VAR)
             PIECE_CLICK_VAR = 1000
-            if which_side_move() == COLOUR_OF_COMPUTER and number_of_human_player == 1 or number_of_human_player == 0 and CHECK_MATE_STATUS == 0:
+            if which_side_move() == COLOUR_OF_COMPUTER and NUMBER_OF_HUMAN_PLAYERS == 1 or NUMBER_OF_HUMAN_PLAYERS == 0 and CHECK_MATE_STATUS == 0:
                 global COMPUTER_PROCESSING_STATUS
                 COMPUTER_PROCESSING_STATUS = 1
                 sleep(0.005)
@@ -607,7 +607,7 @@ def check_checker_box_colourer(piece_moved_input):
 
 def computer_move_spitter():
     global COMPUTER_PROCESSING_STATUS, CHECK_MATE_STATUS
-    if CHECK_MATE_STATUS == 0 and which_side_move() == COLOUR_OF_COMPUTER and number_of_human_player == 1 or number_of_human_player == 0 and CHECK_MATE_STATUS == 0:
+    if CHECK_MATE_STATUS == 0 and which_side_move() == COLOUR_OF_COMPUTER and NUMBER_OF_HUMAN_PLAYERS == 1 or NUMBER_OF_HUMAN_PLAYERS == 0 and CHECK_MATE_STATUS == 0:
         COMPUTER_PROCESSING_STATUS = 1
         entire_board_matrix_ = deepcopy(ENTIRE_BOARD_MATRIX)
         moves_played_ = MOVES_PLAYED
@@ -735,7 +735,7 @@ if CHECKMATER_VAR == 1:
     CHECK_MATE_MOVES = [[28, 36], [12, 35], [25, 13], [5, 5], [18, 5], [4, 58], [
         22, 45], [6, 60], [30, 53], [8, 2], [30, 60], [8, 3], [22, 42], [9, 10], [22, 33]]
     COLOUR_OF_COMPUTER = 1000
-    number_of_human_player = 2
+    NUMBER_OF_HUMAN_PLAYERS = 2
     for move in CHECK_MATE_MOVES:
         computer_piece_mover(move)
 
