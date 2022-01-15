@@ -752,10 +752,3 @@ computer_piece_mover(computer_move_spitter())
 
 
 gameWindow.mainloop()
-
-'''
-Make single player AI game which plays w itself for some rounds and chooses the best move to play w the human opponent
-
-Also the capabilities of the AI game fully depend on the weights given to different pieces,
-so make the next level of software to make these weights accurate using neural networks
-'''
