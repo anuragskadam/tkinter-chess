@@ -20,7 +20,7 @@ HORIZONTAL_VERTICAL_ARRANGEMENT_VAR = [0, 1, 0, 1][SIDE_OF_WHITE]
 SIDE_COLOUR_VAR = [0, 0, 1, 1][SIDE_OF_WHITE]
 # 0, 1 switcher
 
-CHECKMATER_VAR = 1
+CHECKMATER_VAR = 0
 # bool variable to directly create a checkmate state of the board
 
 if number_of_human_player == 1:
