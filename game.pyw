@@ -26,7 +26,7 @@ CHECKMATER_VAR = 0
 if NUMBER_OF_HUMAN_PLAYERS == 1:
     MOVE_TIME_INTERVAL = 500
 elif NUMBER_OF_HUMAN_PLAYERS == 0:
-    MOVE_TIME_INTERVAL = 500
+    MOVE_TIME_INTERVAL = 100
     # milliseconds
 
 
@@ -109,12 +109,11 @@ class Boxes:
         self.piece_contained = piece_contained
         self.bg_colour = boxColourList[colour]
 
-    def pieceTeleporter(self, event, victimCode=1000):
+    def pieceTeleporter_or_box_click_func(self, event, victimCode=1000):
         global PIECE_CLICK_VAR, MOVES_PLAYED, LAST_MOVE, PIECES_ALIVE
         if PIECE_CLICK_VAR < 1000 and boxesList.index(self) in final_destination_giver(
             PIECE_CLICK_VAR) and victimCode == 1000 or PIECE_CLICK_VAR < 1000 and pieceCodeToPositionConverterMainBoard(
                 victimCode) in final_destination_giver(PIECE_CLICK_VAR):
-            # print(PIECE_CLICK_VAR)
             for i in final_destination_giver(PIECE_CLICK_VAR):
                 if i != boxesList.index(self):
                     widget_highlight_remover(boxesList[i])
@@ -123,6 +122,7 @@ class Boxes:
                                                                boxColourList[boxesList[LAST_MOVE[-1][1]].colour])
                 widget_colourer_and_bg_colour_attribute_setter(piecesList[LAST_MOVE[-1][0]],
                                                                boxColourList[boxesList[LAST_MOVE[-1][2]].colour])
+
             boxesList[pieceCodeToPositionConverterMainBoard(
                 PIECE_CLICK_VAR)].colour_occupied = 3
             ENTIRE_BOARD_MATRIX[boxesList[pieceCodeToPositionConverterMainBoard(PIECE_CLICK_VAR)].column][
@@ -146,7 +146,7 @@ class Boxes:
             self.colour_occupied = int(piecesList[PIECE_CLICK_VAR].colour)
             ENTIRE_BOARD_MATRIX[self.column][self.row] = piecesList[PIECE_CLICK_VAR].pieceCode
             MOVES_PLAYED += 1
-            check_checker_box_colourer(PIECE_CLICK_VAR)
+            check_or_checkmate_checker_box_colourer(PIECE_CLICK_VAR)
             PIECE_CLICK_VAR = 1000
             if which_side_move() == COLOUR_OF_COMPUTER and NUMBER_OF_HUMAN_PLAYERS == 1 or NUMBER_OF_HUMAN_PLAYERS == 0 and CHECK_MATE_STATUS == 0:
                 global COMPUTER_PROCESSING_STATUS
@@ -154,6 +154,8 @@ class Boxes:
                 sleep(0.005)
             gameWindow.after(MOVE_TIME_INTERVAL,
                              lambda: computer_piece_mover(computer_move_spitter()))
+        elif self.piece_contained != 1000:
+            piecesList[self.piece_contained].clickFunc(event)
 
 
 class Pieces:
@@ -180,11 +182,15 @@ class Pieces:
         if (
                 MOVES_PLAYED + 1 + SIDE_COLOUR_VAR) % 2 == self.colour and PIECE_CLICK_VAR == 1000 and CHECK_MATE_STATUS == 0 and COMPUTER_PROCESSING_STATUS == 0:
             widget_highlighter(self)
+            widget_highlighter(boxesList[pieceCodeToPositionConverterMainBoard(
+                self.pieceCode)])
 
     def cursorHighlightRemover(self, event=None):
         if (
                 MOVES_PLAYED + 1 + SIDE_COLOUR_VAR) % 2 == self.colour and PIECE_CLICK_VAR == 1000 and CHECK_MATE_STATUS == 0 and COMPUTER_PROCESSING_STATUS == 0:
             widget_highlight_remover(self)
+            widget_highlight_remover(boxesList[pieceCodeToPositionConverterMainBoard(
+                self.pieceCode)])
 
     def clickFunc(self, event):
         global PIECE_CLICK_VAR, MOVES_PLAYED
@@ -193,34 +199,32 @@ class Pieces:
 
                 if PIECE_CLICK_VAR == 1000:
                     PIECE_CLICK_VAR = self.pieceCode
-                    self.widget.config(
-                        bg=clickBoxColourList[
-                            (piecesList[PIECE_CLICK_VAR].column + piecesList[PIECE_CLICK_VAR].row) % 2])
+                    widget_colourer_and_bg_colour_attribute_setter(self, clickBoxColourList[
+                        (piecesList[PIECE_CLICK_VAR].column + piecesList[PIECE_CLICK_VAR].row) % 2])
                     final_destination_giver(PIECE_CLICK_VAR)
                     for i in final_destination_giver(PIECE_CLICK_VAR):
                         widget_highlighter(boxesList[i])
 
                 elif PIECE_CLICK_VAR == self.pieceCode:
-                    self.widget.config(
-                        bg=boxesList[pieceCodeToPositionConverterMainBoard(self.pieceCode)].bg_colour)
+                    widget_colourer_and_bg_colour_attribute_setter(
+                        self, boxesList[pieceCodeToPositionConverterMainBoard(self.pieceCode)].bg_colour)
                     boxesList[8 * self.column + self.row].widget.config(
                         bg=boxesList[pieceCodeToPositionConverterMainBoard(self.pieceCode)].bg_colour)
                     for i in final_destination_giver(PIECE_CLICK_VAR):
                         widget_highlight_remover(boxesList[i])
                     PIECE_CLICK_VAR = 1000
                 else:
-                    piecesList[PIECE_CLICK_VAR].widget.config(bg=boxColourList[boxesList[
-                        pieceCodeToPositionConverterMainBoard(PIECE_CLICK_VAR)].colour])
-                    boxesList[pieceCodeToPositionConverterMainBoard(PIECE_CLICK_VAR)].widget.config(
-                        bg=boxColourList[(piecesList[PIECE_CLICK_VAR].column + piecesList[PIECE_CLICK_VAR].row) % 2])
+                    piecesList[PIECE_CLICK_VAR].widget.config(
+                        bg=boxColourList[boxesList[pieceCodeToPositionConverterMainBoard(PIECE_CLICK_VAR)].colour])
+                    widget_colourer_and_bg_colour_attribute_setter(boxesList[pieceCodeToPositionConverterMainBoard(
+                        PIECE_CLICK_VAR)], boxColourList[(piecesList[PIECE_CLICK_VAR].column + piecesList[PIECE_CLICK_VAR].row) % 2])
                     for i in final_destination_giver(PIECE_CLICK_VAR):
                         widget_highlight_remover(boxesList[i])
                     PIECE_CLICK_VAR = self.pieceCode
-                    self.widget.config(
-                        bg=clickBoxColourList[
-                            (piecesList[PIECE_CLICK_VAR].column + piecesList[PIECE_CLICK_VAR].row) % 2])
-                    boxesList[8 * self.column + self.row].widget.config(
-                        bg=clickBoxColourList[
+                    widget_colourer_and_bg_colour_attribute_setter(self, clickBoxColourList[
+                        (piecesList[PIECE_CLICK_VAR].column + piecesList[PIECE_CLICK_VAR].row) % 2])
+                    widget_colourer_and_bg_colour_attribute_setter(
+                        boxesList[8 * self.column + self.row], clickBoxColourList[
                             (piecesList[PIECE_CLICK_VAR].column + piecesList[PIECE_CLICK_VAR].row) % 2])
                     final_destination_giver(PIECE_CLICK_VAR)
                     for i in final_destination_giver(PIECE_CLICK_VAR):
@@ -231,7 +235,7 @@ class Pieces:
                 SIDE_POINTS[int(self.colour)] -= self.weight
                 PIECES_ALIVE[int(self.colour)].remove(self.pieceCode)
                 boxesList[pieceCodeToPositionConverterMainBoard(
-                    self.pieceCode)].pieceTeleporter(event, self.pieceCode)
+                    self.pieceCode)].pieceTeleporter_or_box_click_func(event, self.pieceCode)
 
 
 class King(Pieces):
@@ -261,8 +265,7 @@ def piece_creator_function(pieceCodeInput, j_var):
     piecesList[pieceCodeInput].widget.config(image=piecesList[pieceCodeInput].art,
                                              bg=boxColourList[
                                                  boxesList[
-                                                     pieceCodeToPositionConverterMainBoard(pieceCodeInput)].colour],
-                                             width=82, height=78)
+                                                     pieceCodeToPositionConverterMainBoard(pieceCodeInput)].colour])
     piecesList[pieceCodeInput].widget.grid(column=piecesList[pieceCodeInput].column,
                                            row=piecesList[pieceCodeInput].row)
     ENTIRE_BOARD_MATRIX[piecesList[pieceCodeInput]
@@ -291,33 +294,46 @@ def widget_colourer_and_bg_colour_attribute_setter(class_instance, colour):
     if class_instance in piecesList:
         class_instance.widget.config(bg=colour)
         boxesList[pieceCodeToPositionConverterMainBoard(
+            piecesList.index(class_instance))].widget.config(bg=colour)
+        boxesList[pieceCodeToPositionConverterMainBoard(
             piecesList.index(class_instance))].bg_colour = colour
     else:
         class_instance.widget.config(bg=colour)
         class_instance.bg_colour = colour
+        if class_instance.piece_contained < 1000:
+            piecesList[class_instance.piece_contained].config(bg=colour)
 
 
 def widget_highlighter(class_instance):
     if class_instance in piecesList:
         class_instance.widget.config(bg=clickBoxColourList[(
             class_instance.column + class_instance.row) % 2])
+        boxesList[pieceCodeToPositionConverterMainBoard(
+            class_instance.pieceCode)].widget.config(bg=clickBoxColourList[(
+                class_instance.column + class_instance.row) % 2])
     elif class_instance.piece_contained == 1000:
         class_instance.widget.config(bg=clickBoxColourList[(
             class_instance.column + class_instance.row) % 2])
     else:
         piecesList[class_instance.piece_contained].widget.config(
             bg=clickBoxColourList[(class_instance.column + class_instance.row) % 2])
+        class_instance.widget.config(bg=clickBoxColourList[(
+            class_instance.column + class_instance.row) % 2])
 
 
 def widget_highlight_remover(class_instance):
     if class_instance in piecesList:
         class_instance.widget.config(
             bg=boxesList[pieceCodeToPositionConverterMainBoard(class_instance.pieceCode)].bg_colour)
+        boxesList[pieceCodeToPositionConverterMainBoard(
+            class_instance.pieceCode)].widget.config(
+            bg=boxesList[pieceCodeToPositionConverterMainBoard(class_instance.pieceCode)].bg_colour)
     elif class_instance.piece_contained == 1000:
         class_instance.widget.config(bg=class_instance.bg_colour)
     else:
         piecesList[class_instance.piece_contained].widget.config(
             bg=class_instance.bg_colour)
+        class_instance.widget.config(bg=class_instance.bg_colour)
 
 
 def boxNumberer():
@@ -358,7 +374,7 @@ def boardConstructor():
                       (r + c) % 2))
             boxesList[8 * r + c].widget.grid(column=r, row=c)
             boxesList[8 * r + c].widget.bind("<Button-1>",
-                                             boxesList[8 * r + c].pieceTeleporter)
+                                             boxesList[8 * r + c].pieceTeleporter_or_box_click_func)
 
 
 boardConstructor()
@@ -571,7 +587,7 @@ def final_destination_giver(piece_code_input, INPUT_BOARD_MATRIX=ENTIRE_BOARD_MA
     return set(output)
 
 
-def check_checker_box_colourer(piece_moved_input):
+def check_or_checkmate_checker_box_colourer(piece_moved_input):
     for i in range(2):
         truth_value = bool(0)
         for opp_piece in PIECES_ALIVE[not i]:
@@ -658,7 +674,7 @@ def computer_move_spitter():
                     piecesList[piece1].movesPlayedByPiece = pawn_memory_1_original
                     piecesList[piece1].movesPlayedByPiece += 1
 
-                checkmate_var = 0
+                checkmate_var = 1
                 for piece2 in pieces_alive_1[not colour_of_computer]:
                     if piecesList[piece2].typeCode == 5:
                         pawn_memory_2_original = piecesList[piece2].movesPlayedByPiece
@@ -666,7 +682,7 @@ def computer_move_spitter():
                     pieces_alive_2 = deepcopy(pieces_alive_1)
 
                     for move2 in final_destination_giver(piece2, temp_board_matrix_2, pieces_alive_2):
-                        checkmate_var += 1
+                        checkmate_var = 0
                         temp_board_matrix_2 = deepcopy(temp_board_matrix_1)
                         pieces_alive_2 = deepcopy(pieces_alive_1)
 
@@ -685,7 +701,8 @@ def computer_move_spitter():
 
                     if piecesList[piece2].typeCode == 5:
                         piecesList[piece2].movesPlayedByPiece = pawn_memory_2_original
-                if checkmate_var == 0:
+                if checkmate_var == 1:
+
                     return [piece1, move1]
                 if temp_list:
                     list_.append(min(temp_list))
@@ -725,7 +742,8 @@ def computer_piece_mover(list_w_piece_code_and_final_position):
         PIECE_CLICK_VAR = computer_move_piece_code
 
         if boxesList[final_position].colour_occupied == 3:
-            boxesList[final_position].pieceTeleporter('<Key>')
+            boxesList[final_position].pieceTeleporter_or_box_click_func(
+                '<Key>')
         else:
             piecesList[boxesList[final_position].piece_contained].clickFunc(
                 '<Key>')
