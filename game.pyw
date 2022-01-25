@@ -199,8 +199,7 @@ class Pieces:
 
                 if PIECE_CLICK_VAR == 1000:
                     PIECE_CLICK_VAR = self.pieceCode
-                    widget_colourer_and_bg_colour_attribute_setter(self, clickBoxColourList[
-                        (piecesList[PIECE_CLICK_VAR].column + piecesList[PIECE_CLICK_VAR].row) % 2])
+                    widget_highlighter(self)
                     final_destination_giver(PIECE_CLICK_VAR)
                     for i in final_destination_giver(PIECE_CLICK_VAR):
                         widget_highlighter(boxesList[i])
@@ -301,7 +300,7 @@ def widget_colourer_and_bg_colour_attribute_setter(class_instance, colour):
         class_instance.widget.config(bg=colour)
         class_instance.bg_colour = colour
         if class_instance.piece_contained < 1000:
-            piecesList[class_instance.piece_contained].config(bg=colour)
+            piecesList[class_instance.piece_contained].widget.config(bg=colour)
 
 
 def widget_highlighter(class_instance):
