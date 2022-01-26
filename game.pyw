@@ -9,7 +9,7 @@ gameWindow.title("Chess")
 gameWindow.resizable(0, 0)
 
 
-SIDE_OF_WHITE = 0
+SIDE_OF_WHITE = 3
 # starting from bottom anti-clockwise [0, 1, 2, 3]
 
 NUMBER_OF_HUMAN_PLAYERS = 1
@@ -253,6 +253,8 @@ def index_2d(myList, v):
     for x in myList:
         if v in x:
             return [myList.index(x), x.index(v)]
+    print(f'index_2d error {v}')
+    return [1000, 1000]
 
 
 def piece_creator_function(pieceCodeInput, j_var):
@@ -360,6 +362,10 @@ def which_side_move():
     return (MOVES_PLAYED + 1 + SIDE_COLOUR_VAR) % 2
 
 
+def board_matrix_printer(board_matrix_input=ENTIRE_BOARD_MATRIX):
+    for row in board_matrix_input:
+        print(row)
+
 # random use functions end
 #
 #
@@ -419,17 +425,19 @@ def piece_constructor():
             piece_creator_function(pieceCodeVar, j)
             typeCodeVar += 1
             pieceCodeVar += 1
-
+        position_of_queen = [3, 3, 4, 4][SIDE_OF_WHITE]
+        position_of_king = [4, 4, 3, 3][SIDE_OF_WHITE]
         piecesList.append(
             Pieces(Label(gameWindow), typeCodeVar,
-                   pieceCodeVar, bool(j), 3, 7 * j, bool(1), int(0)))
+                   pieceCodeVar, bool(j), position_of_queen, 7 * j, bool(1), int(0)))
+
         piece_creator_function(pieceCodeVar, j)
         typeCodeVar += 1
         pieceCodeVar += 1
 
         piecesList.append(
             King(Label(gameWindow), typeCodeVar,
-                 pieceCodeVar, bool(j), 4, 7 * j, bool(1), int(0)))
+                 pieceCodeVar, bool(j), position_of_king, 7 * j, bool(1), int(0)))
         piece_creator_function(pieceCodeVar, j)
         typeCodeVar += 1
         pieceCodeVar += 1
@@ -463,9 +471,9 @@ def simple_possible_destination_giver(pieceCodeInput, ENTIRE_BOARD_MATRIX_INPUT=
             for v in unitVectorList[rookBishopQueenTypeCodeList.index(piecesList[pieceCodeInput].typeCode)]:
                 for i in range(7):
                     # change this into a while loop
-                    position = 8 * (index_2d(ENTIRE_BOARD_MATRIX_INPUT, pieceCodeInput)[0] + (1 + i) * v[
-                        0]) + index_2d(ENTIRE_BOARD_MATRIX_INPUT, pieceCodeInput)[1] + (
-                        1 + i) * v[1]
+                    position = 8 * (index_2d(
+                        ENTIRE_BOARD_MATRIX_INPUT, pieceCodeInput)[0] + (
+                        1 + i) * v[0]) + index_2d(ENTIRE_BOARD_MATRIX_INPUT, pieceCodeInput)[1] + (1 + i) * v[1]
                     if index_2d(ENTIRE_BOARD_MATRIX_INPUT, pieceCodeInput)[0] + (1 + i) * v[0] in range(
                             8) and index_2d(ENTIRE_BOARD_MATRIX_INPUT, pieceCodeInput)[1] + (
                             1 + i) * v[1] in range(8) and box_index_to_board_matrix_element_converter(position,
@@ -764,7 +772,7 @@ computer_piece_mover(computer_move_spitter())
 
 # print("yeah")
 # boxNumberer()
-# print(ENTIRE_BOARD_MATRIX)
+# board_matrix_printer()
 # print(PIECES_ALIVE)
 
 
