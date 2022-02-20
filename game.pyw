@@ -9,10 +9,10 @@ gameWindow.title("Chess")
 gameWindow.resizable(0, 0)
 
 
-SIDE_OF_WHITE = 3
+SIDE_OF_WHITE = 0
 # starting from bottom anti-clockwise [0, 1, 2, 3]
 
-NUMBER_OF_HUMAN_PLAYERS = 1
+NUMBER_OF_HUMAN_PLAYERS = 0
 
 
 HORIZONTAL_VERTICAL_ARRANGEMENT_VAR = [0, 1, 0, 1][SIDE_OF_WHITE]
@@ -24,8 +24,8 @@ CHECKMATER_VAR = 0
 # bool variable to directly create a checkmate state of the board
 
 if NUMBER_OF_HUMAN_PLAYERS == 1:
-    MOVE_TIME_INTERVAL = 500
-elif NUMBER_OF_HUMAN_PLAYERS == 0:
+    MOVE_TIME_INTERVAL = 1000
+else:
     MOVE_TIME_INTERVAL = 100
     # milliseconds
 
@@ -93,10 +93,10 @@ for piece_image_element in pieceImageList:
     with open(piece_image_element[0], 'wb') as wf:
         wf.write(piece_image_element[1])
 
-check_colour = ['salmon', 'crimson']
+check_colour = ['indianred2', 'crimson']
 CHECK_MATE_COLOUR = ['grey', 'grey']
-boxColourList = ['gold', 'darkred']
-clickBoxColourList = ['khaki', 'darkmagenta']
+boxColourList = ['wheat2', 'mediumorchid4']
+clickBoxColourList = ['mistyrose1', 'maroon4']
 
 
 class Boxes:
@@ -156,6 +156,14 @@ class Boxes:
                              lambda: computer_piece_mover(computer_move_spitter()))
         elif self.piece_contained != 1000:
             piecesList[self.piece_contained].clickFunc(event)
+
+    def cursorHighlighter(self, event=None):
+        if self.piece_contained != 1000:
+            piecesList[self.piece_contained].cursorHighlighter(event)
+
+    def cursorHighlightRemover(self, event=None):
+        if self.piece_contained != 1000:
+            piecesList[self.piece_contained].cursorHighlightRemover(event)
 
 
 class Pieces:
@@ -452,6 +460,10 @@ def piece_constructor():
         piece.widget.bind("<Button-1>", piece.clickFunc)
         piece.widget.bind("<Enter>", piece.cursorHighlighter)
         piece.widget.bind("<Leave>", piece.cursorHighlightRemover)
+
+    for box in boxesList:
+        box.widget.bind("<Enter>", box.cursorHighlighter)
+        box.widget.bind("<Leave>", box.cursorHighlightRemover)
 
 
 piece_constructor()
@@ -777,3 +789,5 @@ computer_piece_mover(computer_move_spitter())
 
 
 gameWindow.mainloop()
+
+# python -u "c:\Users\Anurag Kadam\CodingProjects\TkinterChess\game.pyw"
