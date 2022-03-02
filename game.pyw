@@ -12,7 +12,7 @@ gameWindow.resizable(0, 0)
 SIDE_OF_WHITE = 0
 # starting from bottom anti-clockwise [0, 1, 2, 3]
 
-NUMBER_OF_HUMAN_PLAYERS = 0
+NUMBER_OF_HUMAN_PLAYERS = 1
 
 
 HORIZONTAL_VERTICAL_ARRANGEMENT_VAR = [0, 1, 0, 1][SIDE_OF_WHITE]
@@ -26,7 +26,7 @@ CHECKMATER_VAR = 0
 if NUMBER_OF_HUMAN_PLAYERS == 1:
     MOVE_TIME_INTERVAL = 1000
 else:
-    MOVE_TIME_INTERVAL = 100
+    MOVE_TIME_INTERVAL = 10
     # milliseconds
 
 
@@ -111,9 +111,7 @@ class Boxes:
 
     def pieceTeleporter_or_box_click_func(self, event, victimCode=1000):
         global PIECE_CLICK_VAR, MOVES_PLAYED, LAST_MOVE, PIECES_ALIVE
-        if PIECE_CLICK_VAR < 1000 and boxesList.index(self) in final_destination_giver(
-            PIECE_CLICK_VAR) and victimCode == 1000 or PIECE_CLICK_VAR < 1000 and pieceCodeToPositionConverterMainBoard(
-                victimCode) in final_destination_giver(PIECE_CLICK_VAR):
+        if PIECE_CLICK_VAR < 1000 and boxesList.index(self) in final_destination_giver(PIECE_CLICK_VAR) and victimCode == 1000 or PIECE_CLICK_VAR < 1000 and pieceCodeToPositionConverterMainBoard(victimCode) in final_destination_giver(PIECE_CLICK_VAR):
             for i in final_destination_giver(PIECE_CLICK_VAR):
                 if i != boxesList.index(self):
                     widget_highlight_remover(boxesList[i])
@@ -152,10 +150,12 @@ class Boxes:
                 global COMPUTER_PROCESSING_STATUS
                 COMPUTER_PROCESSING_STATUS = 1
                 sleep(0.005)
-            gameWindow.after(MOVE_TIME_INTERVAL,
-                             lambda: computer_piece_mover(computer_move_spitter()))
+                gameWindow.after(MOVE_TIME_INTERVAL,
+                                 lambda: computer_piece_mover(computer_move_spitter()))
+
         elif self.piece_contained != 1000:
             piecesList[self.piece_contained].clickFunc(event)
+        
 
     def cursorHighlighter(self, event=None):
         if self.piece_contained != 1000:
@@ -202,9 +202,8 @@ class Pieces:
 
     def clickFunc(self, event):
         global PIECE_CLICK_VAR, MOVES_PLAYED
-        if CHECK_MATE_STATUS == 0 and COMPUTER_PROCESSING_STATUS == 0:
+        if CHECK_MATE_STATUS == 0 and COMPUTER_PROCESSING_STATUS == 0 or CHECK_MATE_STATUS == 0 and NUMBER_OF_HUMAN_PLAYERS == 0:
             if which_side_move() == self.colour:
-
                 if PIECE_CLICK_VAR == 1000:
                     PIECE_CLICK_VAR = self.pieceCode
                     widget_highlighter(self)
@@ -236,13 +235,14 @@ class Pieces:
                     final_destination_giver(PIECE_CLICK_VAR)
                     for i in final_destination_giver(PIECE_CLICK_VAR):
                         widget_highlighter(boxesList[i])
-            elif PIECE_CLICK_VAR < 1000 and pieceCodeToPositionConverterMainBoard(
+            elif PIECE_CLICK_VAR != 1000 and pieceCodeToPositionConverterMainBoard(
                     self.pieceCode) in final_destination_giver(PIECE_CLICK_VAR):
                 self.widget.grid_remove()
                 SIDE_POINTS[int(self.colour)] -= self.weight
                 PIECES_ALIVE[int(self.colour)].remove(self.pieceCode)
                 boxesList[pieceCodeToPositionConverterMainBoard(
                     self.pieceCode)].pieceTeleporter_or_box_click_func(event, self.pieceCode)
+
 
 
 class King(Pieces):
@@ -261,7 +261,6 @@ def index_2d(myList, v):
     for x in myList:
         if v in x:
             return [myList.index(x), x.index(v)]
-    print(f'index_2d error {v}')
     return [1000, 1000]
 
 
@@ -543,20 +542,15 @@ def simple_possible_destination_giver(pieceCodeInput, ENTIRE_BOARD_MATRIX_INPUT=
 
             position = piececode_to_board_matrix_position_converter(pieceCodeInput,
                                                                     ENTIRE_BOARD_MATRIX_INPUT) + pawnDirection * [1, 8][
-                HORIZONTAL_VERTICAL_ARRANGEMENT_VAR] * 2
-            if piecesList[pieceCodeInput].movesPlayedByPiece == 0 and box_index_to_board_matrix_element_converter(
-                position, ENTIRE_BOARD_MATRIX_INPUT) == 1000 and box_index_to_board_matrix_element_converter(
-                    position - pawnDirection *
-                [1, 8][HORIZONTAL_VERTICAL_ARRANGEMENT_VAR],
-                    ENTIRE_BOARD_MATRIX_INPUT) == 1000:  # this will cause problems in singleplayer computermovespitter
-                possibleDestinations.append(position)
-            position = piececode_to_board_matrix_position_converter(pieceCodeInput,
-                                                                    ENTIRE_BOARD_MATRIX_INPUT) + pawnDirection * [1, 8][
                 HORIZONTAL_VERTICAL_ARRANGEMENT_VAR]
             if box_index_to_board_matrix_element_converter(position,
                                                            ENTIRE_BOARD_MATRIX_INPUT) == 1000 and pawnLongitudnalCoordinate + pawnDirection * 1 in range(
                     8):
                 possibleDestinations.append(position)
+
+                if box_index_to_board_matrix_element_converter(position + pawnDirection * [1, 8][HORIZONTAL_VERTICAL_ARRANGEMENT_VAR], ENTIRE_BOARD_MATRIX_INPUT) == 1000 and piecesList[pieceCodeInput].movesPlayedByPiece == 0:
+                    possibleDestinations.append(
+                        position + pawnDirection * [1, 8][HORIZONTAL_VERTICAL_ARRANGEMENT_VAR])
 
             pawnColumnMovementList = [1, -1]
             for n in pawnColumnMovementList:
@@ -567,11 +561,11 @@ def simple_possible_destination_giver(pieceCodeInput, ENTIRE_BOARD_MATRIX_INPUT=
                         [1000] + like_coloured_piececode_list_spitter(pieceCodeInput)):
                     possibleDestinations.append(position)
 
-        # print(type(possibleDestinations))
         return set(possibleDestinations)
 
 
 def final_destination_giver(piece_code_input, INPUT_BOARD_MATRIX=ENTIRE_BOARD_MATRIX, INPUT_PIECES_ALIVE=PIECES_ALIVE):
+
     TEMP_BOARD_MATRIX = deepcopy(INPUT_BOARD_MATRIX)
     TEMP_PIECES_ALIVE = deepcopy(INPUT_PIECES_ALIVE)
 
@@ -602,7 +596,6 @@ def final_destination_giver(piece_code_input, INPUT_BOARD_MATRIX=ENTIRE_BOARD_MA
                 break
 
         reset_temp_board()
-
     return set(output)
 
 
@@ -742,7 +735,7 @@ def computer_move_spitter():
         if list2:
             return list1[list2.index(max(list2))]
         else:
-            CHECK_MATE_STATUS += 2
+            CHECK_MATE_STATUS += 2  # for stalemate
             for box in boxesList:
                 box.widget.config(bg=clickBoxColourList[box.colour])
             for piece in piecesList:
@@ -766,6 +759,8 @@ def computer_piece_mover(list_w_piece_code_and_final_position):
         else:
             piecesList[boxesList[final_position].piece_contained].clickFunc(
                 '<Key>')
+        
+    
 
 
 if CHECKMATER_VAR == 1:
@@ -791,3 +786,11 @@ computer_piece_mover(computer_move_spitter())
 gameWindow.mainloop()
 
 # python -u "c:\Users\Anurag Kadam\CodingProjects\TkinterChess\game.pyw"
+# print(LAST_MOVE)
+
+'''
+AIM FOR TODAY TILL 2 PM
+1) fix pawn glitch
+2) Castling
+3) Pawn promotion
+'''
