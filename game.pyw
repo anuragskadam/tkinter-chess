@@ -1,4 +1,4 @@
-import os
+from os import remove
 from copy import deepcopy
 from random import shuffle
 from time import sleep
@@ -471,7 +471,11 @@ def piece_constructor():
 piece_constructor()
 
 for piece_element in pieceImageList:
-    os.remove(piece_element[0])
+    try:
+        remove(piece_element[0])
+    except:
+        pass
+
 
 
 def simple_possible_destination_giver(pieceCodeInput, ENTIRE_BOARD_MATRIX_INPUT=ENTIRE_BOARD_MATRIX):
@@ -785,6 +789,12 @@ computer_piece_mover(computer_move_spitter())
 
 
 gameWindow.mainloop()
+
+for piece_element in pieceImageList:
+    try:
+        remove(piece_element[0])
+    except:
+        pass
 
 # python -u "c:\Users\Anurag Kadam\CodingProjects\TkinterChess\game.pyw"
 # print(LAST_MOVE)
