@@ -98,10 +98,10 @@ for piece_image_element in pieceImageList:
 with open(blank_box_widget_list[0], 'wb') as wf:
     wf.write(blank_box_widget_list[1])
 
-check_colour = ['indianred2', 'crimson']
+check_colour = ['salmon', 'crimson']
 CHECK_MATE_COLOUR = ['grey', 'grey']
-boxColourList = ['wheat2', 'mediumorchid4']
-clickBoxColourList = ['mistyrose1', 'maroon4']
+boxColourList = ['gold', 'darkred']
+clickBoxColourList = ['khaki', 'darkmagenta']
 
 
 class Boxes:
