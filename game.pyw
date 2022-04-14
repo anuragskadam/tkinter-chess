@@ -1,8 +1,9 @@
+from time import sleep
 from os import remove
 from copy import deepcopy
 from random import shuffle
-from time import sleep
 from tkinter import *
+
 
 gameWindow = Tk()
 gameWindow.title("Chess")
@@ -601,37 +602,35 @@ def simple_possible_destination_giver(pieceCodeInput, ENTIRE_BOARD_MATRIX_INPUT=
 
 
 def final_destination_giver(piece_code_input, INPUT_BOARD_MATRIX=ENTIRE_BOARD_MATRIX, INPUT_PIECES_ALIVE=PIECES_ALIVE):
-
     TEMP_BOARD_MATRIX = deepcopy(INPUT_BOARD_MATRIX)
-    TEMP_PIECES_ALIVE = deepcopy(INPUT_PIECES_ALIVE)
-
-    def reset_temp_board():
-        nonlocal TEMP_BOARD_MATRIX, TEMP_PIECES_ALIVE
-        TEMP_BOARD_MATRIX = deepcopy(INPUT_BOARD_MATRIX)
-        TEMP_PIECES_ALIVE = deepcopy(INPUT_PIECES_ALIVE)
 
     initially_allowed_boxes = simple_possible_destination_giver(
         piece_code_input, TEMP_BOARD_MATRIX).copy()
+
     output = initially_allowed_boxes.copy()
 
+    piece_code_input_postion = index_2d(
+        TEMP_BOARD_MATRIX, piece_code_input)
+
+    king_colour_to_check = piecesList[piece_code_input].colour
+
     for destination in initially_allowed_boxes:
+        piece_at_destination = TEMP_BOARD_MATRIX[destination //
+                                                 8][destination % 8]
 
-        TEMP_BOARD_MATRIX[index_2d(TEMP_BOARD_MATRIX, piece_code_input)[0]][
-            index_2d(TEMP_BOARD_MATRIX, piece_code_input)[1]] = 6969
+        TEMP_BOARD_MATRIX[piece_code_input_postion[0]
+                          ][piece_code_input_postion[1]] = 6969
+        TEMP_BOARD_MATRIX[destination // 8][destination %
+                                            8] = piece_code_input
 
-        if TEMP_BOARD_MATRIX[destination // 8][destination % 8] in TEMP_PIECES_ALIVE[
-                int(not piecesList[piece_code_input].colour)]:
-            TEMP_PIECES_ALIVE[int(not piecesList[piece_code_input].colour)].remove(
-                TEMP_BOARD_MATRIX[destination // 8][destination % 8])
-        TEMP_BOARD_MATRIX[destination // 8][destination % 8] = piece_code_input
-        for opp_piece in TEMP_PIECES_ALIVE[int(not piecesList[piece_code_input].colour)]:
-            if piececode_to_board_matrix_position_converter(king_code(piecesList[piece_code_input].colour),
-                                                            TEMP_BOARD_MATRIX) in simple_possible_destination_giver(
-                    opp_piece, TEMP_BOARD_MATRIX):
-                output.remove(destination)
-                break
+        if check_checker(king_colour_to_check, TEMP_BOARD_MATRIX) == 1:
+            output.remove(destination)
 
-        reset_temp_board()
+        TEMP_BOARD_MATRIX[destination // 8][destination %
+                                            8] = piece_at_destination
+        TEMP_BOARD_MATRIX[piece_code_input_postion[0]
+                          ][piece_code_input_postion[1]] = piece_code_input
+
     return set(output)
 
 
@@ -642,8 +641,7 @@ def check_checker(king_colour_input, INPUT_BOARD_MATRIX=ENTIRE_BOARD_MATRIX):
     for type_looper, piece_looper in enumerate(list(i + [0, 6][king_colour_input] for i in range(32, 38))):
         TEMP_BOARD_MATRIX[king_position[0]][king_position[1]] = piece_looper
         if type_looper in [piecesList[TEMP_BOARD_MATRIX[i // 8][i % 8]].typeCode for i in simple_possible_destination_giver(piece_looper, TEMP_BOARD_MATRIX, 1) if TEMP_BOARD_MATRIX[i // 8][i % 8] != 6969]:
-            print(piece_looper, "ye", f"color: {['black', 'white'][king_colour_input]}", type_looper, [piecesList[TEMP_BOARD_MATRIX[i // 8][i % 8]
-                                                                                                                  ].typeCode for i in simple_possible_destination_giver(piece_looper, TEMP_BOARD_MATRIX, 1) if TEMP_BOARD_MATRIX[i // 8][i % 8] != 6969])
+
             return 1
     return 0
 
