@@ -13,7 +13,9 @@ gameWindow.resizable(0, 0)
 SIDE_OF_WHITE = 0
 # starting from bottom anti-clockwise [0, 1, 2, 3]
 
+
 NUMBER_OF_HUMAN_PLAYERS = 1
+
 
 
 HORIZONTAL_VERTICAL_ARRANGEMENT_VAR = [0, 1, 0, 1][SIDE_OF_WHITE]
@@ -835,19 +837,3 @@ try:
     remove(blank_box_widget_list[0])
 except:
     pass
-
-# python -u "c:\Users\Anurag Kadam\CodingProjects\TkinterChess\game.pyw"
-# print(LAST_MOVE)
-
-
-'''
-Aims
-1) Comment the colour bs - Done
-2) Castling
-3) Pawn promotion
-4) UI
-5) Efficient check-checker
-6) Multiprocessing
-7) Create a check_checker function - Done
-8) Convert 1000s to 6969s - Done
-'''
