@@ -15,5 +15,5 @@ How to play
 - Download the "game.pyw" file onto your device, and run it using a Python 3 interpreter
 
 Quirks and Features
-- If you edit the variable in line 17 (NUMBER_OF_HUMAN_PLAYERS) to '0' and run the program, the chess engine will play against itself from both sides.
+- If you edit the variable NUMBER_OF_HUMAN_PLAYERS to 0 and run the program, the chess engine will play against itself from both sides.
 - Similarly if you change that variable to '2', the game can be used by two users to play against each other.
